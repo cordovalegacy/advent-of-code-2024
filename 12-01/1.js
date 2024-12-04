@@ -1,6 +1,8 @@
 // pair up the numbers
 // measure how far apart they are
 
+import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
+
 //pair up the smallest number in the left list, with the smallest number in the right list
 // then the second smallest number in the left list with the second smallest number in the right list
 // and so on
@@ -21,40 +23,38 @@
 // 1. create two lists with mock data
 // 2. find the smallest number in both lists, pair them, then pop them
 
-const fs = require('fs')
-
 const leftList = []
 const rightList = []
-let sum = 0
 
 const handleNumericSort = (arr) => {
     return arr.sort((a, b) => a - b)
 }
 
-const calculateDifference = () => {
+const handleCalculateDistance = () => {
     const sortedAscendingLeftList = handleNumericSort(leftList)
     const sortedAscendingRightList = handleNumericSort(rightList)
+    let sum = 0
     sortedAscendingLeftList.forEach((_, i) => {
         sum += Math.abs(sortedAscendingRightList[i] - sortedAscendingLeftList[i])
     })
-    console.log(sortedAscendingLeftList);
-    console.log(sortedAscendingRightList);
-    console.log(sum);
+    return sum
 }
 
-const parseInputText = () => {
-    fs.readFile("input.txt", (_, data) => {
-        let parsedData = data.toString().replaceAll("\n", ",").replaceAll("   ", ",").split(",")
-        parsedData.forEach((text, i) => {
-            if (i & 1) {
-                rightList.push(text)
-            } else {
-                leftList.push(text)
-            }
-        })
-        calculateDifference()
+const handleParseData = async (arr) => {
+    arr.forEach((text, i) => {
+        const num = Number(text.trim())
+        if (i & 1) {
+            rightList.push(num)
+        } else {
+            leftList.push(num)
+        }
     })
 }
 
-parseInputText()
+const handleDistanceOfPairsInAscendingList = async () => {
+    const parsedData = await handleTextFileExtraction()
+    await handleParseData(parsedData)
+    return handleCalculateDistance()
+}
 
+handleDistanceOfPairsInAscendingList().then((result) => console.log(result))
