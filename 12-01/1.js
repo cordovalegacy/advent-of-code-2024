@@ -1,8 +1,6 @@
 // pair up the numbers
 // measure how far apart they are
 
-import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
-
 //pair up the smallest number in the left list, with the smallest number in the right list
 // then the second smallest number in the left list with the second smallest number in the right list
 // and so on
@@ -22,6 +20,12 @@ import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
 
 // 1. create two lists with mock data
 // 2. find the smallest number in both lists, pair them, then pop them
+
+import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
+
+const handleTextFormatting = async(extractedString) => {
+    return extractedString.toString().replaceAll("\n", ",").replaceAll("   ", ",").split(",")
+}
 
 export const handleNumericSort = (arr) => {
     return arr.sort((a, b) => a - b)
@@ -52,9 +56,10 @@ export const handleSplitIntoLists = async (arr) => {
 }
 
 export const handleDistanceOfPairsInAscendingList = async () => {
-    const parsedData = await handleTextFileExtraction()
+    const extractedText = await handleTextFileExtraction()
+    const parsedData = await handleTextFormatting(extractedText)
     const { leftList, rightList } = await handleSplitIntoLists(parsedData)
     return handleCalculateDistance(leftList, rightList)
 }
 
-// handleDistanceOfPairsInAscendingList().then((result) => console.log(result))
+handleDistanceOfPairsInAscendingList().then((result) => console.log(result))
