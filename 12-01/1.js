@@ -23,14 +23,11 @@ import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
 // 1. create two lists with mock data
 // 2. find the smallest number in both lists, pair them, then pop them
 
-const leftList = []
-const rightList = []
-
-const handleNumericSort = (arr) => {
+export const handleNumericSort = (arr) => {
     return arr.sort((a, b) => a - b)
 }
 
-const handleCalculateDistance = () => {
+const handleCalculateDistance = (leftList, rightList) => {
     const sortedAscendingLeftList = handleNumericSort(leftList)
     const sortedAscendingRightList = handleNumericSort(rightList)
     let sum = 0
@@ -40,7 +37,9 @@ const handleCalculateDistance = () => {
     return sum
 }
 
-const handleParseData = async (arr) => {
+export const handleSplitIntoLists = async (arr) => {
+    const leftList = []
+    const rightList = []
     arr.forEach((text, i) => {
         const num = Number(text.trim())
         if (i & 1) {
@@ -49,12 +48,13 @@ const handleParseData = async (arr) => {
             leftList.push(num)
         }
     })
+    return { leftList, rightList }
 }
 
-const handleDistanceOfPairsInAscendingList = async () => {
+export const handleDistanceOfPairsInAscendingList = async () => {
     const parsedData = await handleTextFileExtraction()
-    await handleParseData(parsedData)
-    return handleCalculateDistance()
+    const { leftList, rightList } = await handleSplitIntoLists(parsedData)
+    return handleCalculateDistance(leftList, rightList)
 }
 
-handleDistanceOfPairsInAscendingList().then((result) => console.log(result))
+// handleDistanceOfPairsInAscendingList().then((result) => console.log(result))
