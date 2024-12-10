@@ -41,7 +41,6 @@ const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) 
     let index = reportIdx
     let lengthMatcher = 0
     const report = reportsWithLevels[index]
-    let isIncrementing = true
     report.map((_, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
         const isBetweenOneAndThree = difference >= 1 && difference <= 3
@@ -50,8 +49,7 @@ const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) 
         const isNegative = Math.sign(difference) === -1
 
 
-        if (isPositive && isIncrementing) {
-            isIncrementing = true
+        if (isPositive) {
             if (isBetweenOneAndThree) {
                 lengthMatcher++
             } else {
@@ -59,7 +57,6 @@ const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) 
             }
 
         } else if (isNegative) {
-            isIncrementing = false
             if (isBetweenOneAndThree) {
                 lengthMatcher++
             } else {
