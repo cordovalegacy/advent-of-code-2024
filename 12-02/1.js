@@ -41,42 +41,44 @@ const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) 
     let index = reportIdx
     let lengthMatcher = 0
     const report = reportsWithLevels[index]
-    report.map((_, idx, arr) => {
-        const difference = +arr[idx + 1] - +arr[idx]
-        const isBetweenOneAndThree = difference >= 1 && difference <= 3
+    if (index <= reportsWithLevels.length) {
+        report.map((_, idx, arr) => {
+            const difference = +arr[idx + 1] - +arr[idx]
+            const isBetweenOneAndThree = difference >= 1 && difference <= 3
 
-        const isPositive = Math.sign(difference) === 1
-        const isNegative = Math.sign(difference) === -1
+            const isPositive = Math.sign(difference) === 1
+            const isNegative = Math.sign(difference) === -1
 
 
-        if (isPositive) {
-            if (isBetweenOneAndThree) {
-                lengthMatcher++
-            } else {
+            if (isPositive) {
+                if (isBetweenOneAndThree) {
+                    lengthMatcher++
+                } else {
+                    return
+                }
+
+            } else if (isNegative) {
+                if (isBetweenOneAndThree) {
+                    lengthMatcher++
+                } else {
+                    return
+                }
+            }
+            else {
+                lengthMatcher = 0
+                return index++
+            }
+            if (lengthMatcher === report.length - 1) {
+                console.log("MET", lengthMatcher === report.length - 1, index);
+                lengthMatcher = 0
+                countOfSafeReports++
+                index++
                 return
             }
+        })
+    }
 
-        } else if (isNegative) {
-            if (isBetweenOneAndThree) {
-                lengthMatcher++
-            } else {
-                return
-            }
-        }
-        else {
-            lengthMatcher = 0
-            return index++
-        }
-        if (lengthMatcher === report.length - 1) {
-            console.log("MET", lengthMatcher === report.length - 1, index);
-            lengthMatcher = 0
-            countOfSafeReports++
-            index++
-            return
-        }
-    })
-    
-    
+
     console.log("-----------------------");
     console.log("INDEX: ", index);
     console.log("SAFE REPORT COUNT: ", countOfSafeReports);
