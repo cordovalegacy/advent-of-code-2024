@@ -43,39 +43,34 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
     if (reportIdx > reportsWithLevels.length - 1) {
         return
     }
-
+    console.log(report);
     report.map((val, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
 
         const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
         const isBetweenNegativeOneAndThree = difference <= -1 && difference >= -3
-        const isPositive = Math.sign(difference) === 1
-        const isNegative = Math.sign(difference) === -1
 
-        if (isPositive && isBetweenPositiveOneAndThree) {
+        if (isBetweenPositiveOneAndThree) {
             arrLengthMatcher++
             console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
         } 
         
-        else if (isNegative && isBetweenNegativeOneAndThree) {
+        else if (isBetweenNegativeOneAndThree) {
             arrLengthMatcher++
             console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
         } 
         
-        else {
-            return
-        }
-
-        if (arrLengthMatcher === arr.length - 1) {
-            console.log("MET", arrLengthMatcher === arr.length - 1, arrLengthMatcher, arr.length - 1)
-            countOfSafeReports++
-            return
-        }
+        else return
     })
 
-    console.log("-----------------------")
+    if (arrLengthMatcher === report.length - 1) {
+        console.log("MET", arrLengthMatcher === report.length - 1, arrLengthMatcher, report.length - 1)
+        countOfSafeReports++
+    }
+
     console.log("REPORT INDEX: ", reportIdx)
     console.log("SAFE REPORT COUNT: ", countOfSafeReports)
+    console.log("-----------------------")
     handleDetectSafeReports({ reportsWithLevels, reportIdx: reportIdx + 1, safeReportCount: countOfSafeReports })
 }
 
