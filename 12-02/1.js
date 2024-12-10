@@ -63,7 +63,7 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
         else return
     })
 
-    if (arrLengthMatcher === report.length - 1) {
+    if (arrLengthMatcher === report.length) {
         console.log("MET", arrLengthMatcher === report.length - 1, arrLengthMatcher, report.length - 1)
         countOfSafeReports++
     }
