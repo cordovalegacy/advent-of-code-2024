@@ -36,53 +36,47 @@ const handleParsingReportsIntoListsOfLevels = async (parsedData) => {
     return reportsWithLevels
 }
 
-const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) => {
-    let countOfSafeReports = safeCount
-    let lengthMatcher = 0
+const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeReportCount }) => {
+    let countOfSafeReports = safeReportCount
+    let arrLengthMatcher = 0
     const report = reportsWithLevels[reportIdx]
-    if (reportIdx >= reportsWithLevels.length) {
+    if (reportIdx > reportsWithLevels.length - 1) {
         return
     }
-    report.map((_, idx, arr) => {
-        const difference = +arr[idx + 1] - +arr[idx]
-        const isBetweenOneAndThree = difference >= 1 && difference <= 3
 
+    report.map((val, idx, arr) => {
+        const difference = +arr[idx + 1] - +arr[idx]
+
+        const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
+        const isBetweenNegativeOneAndThree = difference <= -1 && difference >= -3
         const isPositive = Math.sign(difference) === 1
         const isNegative = Math.sign(difference) === -1
 
-
-        if (isPositive) {
-            if (isBetweenOneAndThree) {
-                lengthMatcher++
-            } else {
-                console.log("HERE");
-
-            }
-
-        } else if (isNegative) {
-            if (isBetweenOneAndThree) {
-                lengthMatcher++
-            } else {
-                console.log("HERE");
-
-            }
-        }
+        if (isPositive && isBetweenPositiveOneAndThree) {
+            arrLengthMatcher++
+            console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
+        } 
+        
+        else if (isNegative && isBetweenNegativeOneAndThree) {
+            arrLengthMatcher++
+            console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
+        } 
+        
         else {
-            lengthMatcher = 0
             return
         }
-        if (lengthMatcher === report.length - 1) {
-            console.log("MET", lengthMatcher === report.length - 1);
+
+        if (arrLengthMatcher === arr.length - 1) {
+            console.log("MET", arrLengthMatcher === arr.length - 1, arrLengthMatcher, arr.length - 1)
             countOfSafeReports++
             return
         }
     })
 
-
-console.log("-----------------------");
-console.log("REPORT INDEX: ", reportIdx);
-console.log("SAFE REPORT COUNT: ", countOfSafeReports);
-handleDetectSafeReports(reportsWithLevels, reportIdx + 1, countOfSafeReports)
+    console.log("-----------------------")
+    console.log("REPORT INDEX: ", reportIdx)
+    console.log("SAFE REPORT COUNT: ", countOfSafeReports)
+    handleDetectSafeReports({ reportsWithLevels, reportIdx: reportIdx + 1, safeReportCount: countOfSafeReports })
 }
 
 const handleParsingAndExtractionOfData = async () => {
@@ -90,7 +84,7 @@ const handleParsingAndExtractionOfData = async () => {
     const formattedText = await handleTextFormatting(extractedText)
     const parsedData = await formattedText.replaceAll("\n", " * ").split(" * ")
     const reportsWithLevels = await handleParsingReportsIntoListsOfLevels(parsedData)
-    const safeReportCount = await handleDetectSafeReports(reportsWithLevels, 0, 0)
+    const safeReports = await handleDetectSafeReports({ reportsWithLevels, reportIdx: 0, safeReportCount: 0 })
 }
 
 handleParsingAndExtractionOfData()
