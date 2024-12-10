@@ -39,11 +39,13 @@ const handleParsingReportsIntoListsOfLevels = async (parsedData) => {
 const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeReportCount }) => {
     let countOfSafeReports = safeReportCount
     let arrLengthMatcher = 0
+    let direction = null
     const report = reportsWithLevels[reportIdx]
+
     if (reportIdx > reportsWithLevels.length - 1) {
         return
     }
-    console.log(report);
+    
     report.map((val, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
 
@@ -51,26 +53,32 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
         const isBetweenNegativeOneAndThree = difference <= -1 && difference >= -3
 
         if (isBetweenPositiveOneAndThree) {
+            if(direction === null){
+                direction = 'positive'
+            } 
+            else if(direction === 'negative'){
+                return
+            }
             arrLengthMatcher++
-            console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
         } 
         
         else if (isBetweenNegativeOneAndThree) {
+            if(direction === null){
+                direction = 'negative'
+            } 
+            else if(direction === 'positive'){
+                return
+            }
             arrLengthMatcher++
-            console.log({ difference }, { val }, { idx }, { arr: arr.length }, { reportIdx })
         } 
         
         else return
     })
 
-    if (arrLengthMatcher === report.length) {
-        console.log("MET", arrLengthMatcher === report.length - 1, arrLengthMatcher, report.length - 1)
+    if (arrLengthMatcher === report.length - 1) {
         countOfSafeReports++
     }
 
-    console.log("REPORT INDEX: ", reportIdx)
-    console.log("SAFE REPORT COUNT: ", countOfSafeReports)
-    console.log("-----------------------")
     handleDetectSafeReports({ reportsWithLevels, reportIdx: reportIdx + 1, safeReportCount: countOfSafeReports })
 }
 
@@ -79,7 +87,7 @@ const handleParsingAndExtractionOfData = async () => {
     const formattedText = await handleTextFormatting(extractedText)
     const parsedData = await formattedText.replaceAll("\n", " * ").split(" * ")
     const reportsWithLevels = await handleParsingReportsIntoListsOfLevels(parsedData)
-    const safeReports = await handleDetectSafeReports({ reportsWithLevels, reportIdx: 0, safeReportCount: 0 })
+    handleDetectSafeReports({ reportsWithLevels, reportIdx: 0, safeReportCount: 0 })
 }
 
 handleParsingAndExtractionOfData()
