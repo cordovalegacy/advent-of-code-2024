@@ -17,17 +17,81 @@
 // the levels are either all increasing or all decreasing
 // any two adjacent levels differ by at least one or at most three
 
+// sum up safe report count
+
 import handleTextFileExtraction from '../utilities/textFileExtractor.cjs'
 
 const handleTextFormatting = async (extractedText) => {
     return extractedText.toString()
 }
 
-const initializeExtraction = async () => {
-    const extractedText = await handleTextFileExtraction()
-    const parsedData = await handleTextFormatting(extractedText)
-    console.log(parsedData);
-
+const handleParsingReportsIntoListsOfLevels = async (parsedData) => {
+    const reportsWithLevels = []
+    const listsOfLevelsWithSpaces = []
+    parsedData.forEach((report, _) => listsOfLevelsWithSpaces.push(report.split(" ")))
+    listsOfLevelsWithSpaces.forEach((level, _) => {
+        const newReport = level.filter((level) => level !== " ")
+        reportsWithLevels.push(newReport)
+    })
+    return reportsWithLevels
 }
 
-initializeExtraction()
+const handleDetectSafeReports = async (reportsWithLevels, reportIdx, safeCount) => {
+    let countOfSafeReports = safeCount
+    let index = reportIdx
+    let lengthMatcher = 0
+    const report = reportsWithLevels[index]
+    let isIncrementing = true
+    report.map((_, idx, arr) => {
+        const difference = +arr[idx + 1] - +arr[idx]
+        const isBetweenOneAndThree = difference >= 1 && difference <= 3
+
+        const isPositive = Math.sign(difference) === 1
+        const isNegative = Math.sign(difference) === -1
+
+
+        if (isPositive && isIncrementing) {
+            isIncrementing = true
+            if (isBetweenOneAndThree) {
+                lengthMatcher++
+            } else {
+                return
+            }
+
+        } else if (isNegative) {
+            isIncrementing = false
+            if (isBetweenOneAndThree) {
+                lengthMatcher++
+            } else {
+                return
+            }
+        }
+        else {
+            lengthMatcher = 0
+            return index++
+        }
+        if (lengthMatcher === report.length - 1) {
+            console.log("MET", lengthMatcher === report.length - 1, index);
+            lengthMatcher = 0
+            countOfSafeReports++
+            index++
+            return
+        }
+    })
+    
+    
+    console.log("-----------------------");
+    console.log("INDEX: ", index);
+    console.log("SAFE REPORT COUNT: ", countOfSafeReports);
+    handleDetectSafeReports(reportsWithLevels, index, countOfSafeReports)
+}
+
+const handleParsingAndExtractionOfData = async () => {
+    const extractedText = await handleTextFileExtraction()
+    const formattedText = await handleTextFormatting(extractedText)
+    const parsedData = await formattedText.replaceAll("\n", " * ").split(" * ")
+    const reportsWithLevels = await handleParsingReportsIntoListsOfLevels(parsedData)
+    const safeReportCount = await handleDetectSafeReports(reportsWithLevels, 0, 0)
+}
+
+handleParsingAndExtractionOfData()
