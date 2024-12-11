@@ -31,36 +31,59 @@ const handleParsingReportsIntoListsOfLevels = async (parsedData) => {
     return reportsWithLevels
 }
 
-const handleEachReport = async(report, arrLengthMatcher) => {
+const handleEachReport = async (report, arrLengthMatcher, reportIdx) => {
     let direction = null
-    
-    report.forEach((_, idx, arr) => {
+
+    report.forEach((val, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
 
         const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
         const isBetweenNegativeOneAndThree = difference <= -1 && difference >= -3
 
         if (isBetweenPositiveOneAndThree) {
-            if(direction === null){
+            if (direction === null) {
                 direction = 'positive'
-            } 
-            else if(direction === 'negative'){
+            }
+            else if (direction === 'negative') {
                 return
             }
             arrLengthMatcher++
-        } 
-        
+        }
+
         else if (isBetweenNegativeOneAndThree) {
-            if(direction === null){
+            if (direction === null) {
                 direction = 'negative'
-            } 
-            else if(direction === 'positive'){
+            }
+            else if (direction === 'positive') {
                 return
             }
             arrLengthMatcher++
-        } 
-        
-        else return
+        }
+
+        else {
+            const indexOfFailedAttempt = idx
+            let newArrLengthMatcher = 0
+            const reportToRetry = report.slice(0, indexOfFailedAttempt)
+            reportToRetry.forEach((val, idx, arr) => {
+
+                let difference = +arr[idx + 1] - +arr[idx]
+                const slicedLengthPoint = 1
+
+                const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
+                const isBetweenNegativeOneAndThree = difference <= -1 && difference >= -3
+
+                if (isBetweenPositiveOneAndThree) {
+                    newArrLengthMatcher++
+                    console.log("+ -> VAL: ", {reportIdx}, { val }, { newArrLengthMatcher }, { difference });
+                } else if (isBetweenNegativeOneAndThree) {
+                    arrLengthMatcher++
+                    console.log("- ->VAL: ", {reportIdx}, { val }, { newArrLengthMatcher }, { difference });
+                }
+                arrLengthMatcher = (newArrLengthMatcher + slicedLengthPoint)
+            })
+            // console.log({indexOfFailedAttempt}, {report}, {reportToRetry}, {reportIdx});
+            return
+        }
     })
 
     return arrLengthMatcher
@@ -74,8 +97,8 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
     if (reportIdx > reportsWithLevels.length - 1) {
         return countOfSafeReports
     }
-    
-    const result = await handleEachReport(report, arrLengthMatcher)
+
+    const result = await handleEachReport(report, arrLengthMatcher, reportIdx)
     arrLengthMatcher = result
 
     if (arrLengthMatcher === report.length - 1) {
