@@ -55,7 +55,7 @@ const retryReportMechanism = async ({ idx, arr, arrLengthMatcher }) => {
 const handleEachReport = async (report, arrLengthMatcher) => {
     let direction = null
 
-    report.forEach(async (_, idx, arr) => {
+    return report.forEach(async (_, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
 
         const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
@@ -84,8 +84,9 @@ const handleEachReport = async (report, arrLengthMatcher) => {
         else {           
             return arrLengthMatcher = await retryReportMechanism({ idx, arr, arrLengthMatcher })
         }
+
+        return arrLengthMatcher
     })
-    return arrLengthMatcher
 }
 
 const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeReportCount }) => {
