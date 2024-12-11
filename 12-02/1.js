@@ -43,10 +43,10 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
     const report = reportsWithLevels[reportIdx]
 
     if (reportIdx > reportsWithLevels.length - 1) {
-        return
+        return countOfSafeReports
     }
     
-    report.map((val, idx, arr) => {
+    report.forEach((_, idx, arr) => {
         const difference = +arr[idx + 1] - +arr[idx]
 
         const isBetweenPositiveOneAndThree = difference >= 1 && difference <= 3
@@ -79,7 +79,7 @@ const handleDetectSafeReports = async ({ reportsWithLevels, reportIdx, safeRepor
         countOfSafeReports++
     }
 
-    handleDetectSafeReports({ reportsWithLevels, reportIdx: reportIdx + 1, safeReportCount: countOfSafeReports })
+    return handleDetectSafeReports({ reportsWithLevels, reportIdx: reportIdx + 1, safeReportCount: countOfSafeReports })
 }
 
 const handleParsingAndExtractionOfData = async () => {
@@ -87,7 +87,8 @@ const handleParsingAndExtractionOfData = async () => {
     const formattedText = await handleTextFormatting(extractedText)
     const parsedData = await formattedText.replaceAll("\n", " * ").split(" * ")
     const reportsWithLevels = await handleParsingReportsIntoListsOfLevels(parsedData)
-    handleDetectSafeReports({ reportsWithLevels, reportIdx: 0, safeReportCount: 0 })
+    const reportCount = await handleDetectSafeReports({ reportsWithLevels, reportIdx: 0, safeReportCount: 0 })
+    console.log("REPORT COUNT: ", reportCount);
 }
 
 handleParsingAndExtractionOfData()
